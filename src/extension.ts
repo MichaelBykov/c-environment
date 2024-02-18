@@ -49,7 +49,7 @@ export function activate(context: vscode.ExtensionContext) {
           new vscode.Position(parseInt(line) - 1, parseInt(column) - 1),
           new vscode.Position(parseInt(line) - 1, parseInt(column) - 1)
         );
-        return { file, range, message, severity: vscode.DiagnosticSeverity.Error }
+        return { file, range, message: message.trim(), severity: vscode.DiagnosticSeverity.Error }
       })
 
       const fileDiagnostics: { [file: string]: any[] } = {}
