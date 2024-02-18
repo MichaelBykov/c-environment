@@ -13,6 +13,7 @@ const execAsync = promisify(exec);
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+  const diagnosticsMap = vscode.languages.createDiagnosticCollection('Easy C')
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
@@ -23,6 +24,9 @@ export function activate(context: vscode.ExtensionContext) {
 	// The commandId parameter must match the command field in package.json
 	const compileC = vscode.commands.registerCommand('easy-c.compile-c', async () => {
     try {
+      // Clear old errors
+      diagnosticsMap.clear()
+
       const cwd = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
       if (!cwd) {
         vscode.window.showErrorMessage('No workspace found');
@@ -67,10 +71,16 @@ export function activate(context: vscode.ExtensionContext) {
         existing.push(new vscode.Diagnostic(range, message, severity))
       }
 
-      const diagnosticsMap = vscode.languages.createDiagnosticCollection('Easy C')
       for (const [file, diagnostic] of Object.entries(fileDiagnostics)) {
         diagnosticsMap.set(vscode.Uri.file(file), diagnostic)
       }
+
+      const onSave = vscode.workspace.onDidSaveTextDocument((document) => {
+        if (diagnosticsMap.has(document.uri)) {
+          diagnosticsMap.delete(document.uri)
+        }
+      })
+      context.subscriptions.push(onSave)
       
       if (diagnostics.length === 0) {
         vscode.window.showErrorMessage(error?.message || 'An error occurred');
