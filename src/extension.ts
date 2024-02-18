@@ -30,7 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
       }
       const filePaths = files.join(' ')
       
-      await execAsync(`cc ${filePaths} -o ${outputFile} -fno-diagnostics-fixit-info -fdiagnostics-print-source-range-info -fno-caret-diagnostics -fno-color-diagnostics`)
+      await execAsync(`cc ${filePaths} -o ${outputFile} -fno-diagnostics-fixit-info -fno-caret-diagnostics -fno-color-diagnostics`)
 
       const task = new vscode.Task(
         { type: 'shell' },
