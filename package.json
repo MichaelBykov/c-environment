@@ -14,8 +14,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "easy-c.helloWorld",
-        "title": "Hello World"
+        "command": "easy-c.compile-c",
+        "title": "Compile C"
       }
     ],
     "viewsContainers": {
@@ -38,7 +38,7 @@
     "viewsWelcome": [
       {
         "view": "easy-c",
-        "contents": "Hello world!\n[run my program now!](command:easy-c.helloWorld)"
+        "contents": "Hello world!\n[run my program now!](command:easy-c.compile-c)"
       }
     ]
   },
