@@ -4,24 +4,11 @@ import { promisify } from 'util';
 import { glob } from 'glob';
 const execAsync = promisify(exec);
 
-// Recursively find all .c files in the workspace and compile them
-// Then run the compiled file
-// If there are any compile errors, show them in the problems tab
-// If there are any runtime errors, show them in the terminal
-
-
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
   const diagnosticsMap = vscode.languages.createDiagnosticCollection('Easy C')
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "easy-c" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
 	const compileC = vscode.commands.registerCommand('easy-c.compile-c', async () => {
     try {
       // Clear old errors
