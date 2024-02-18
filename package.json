@@ -17,6 +17,29 @@
         "command": "easy-c.helloWorld",
         "title": "Hello World"
       }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "easy-c",
+          "title": "Easy C",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "easy-c": [
+        {
+          "id": "easy-c",
+          "name": "Easy C"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "easy-c",
+        "contents": "Hello world!\n[run my program now!](command:easy-c.helloWorld)"
+      }
     ]
   },
   "scripts": {
