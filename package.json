@@ -38,7 +38,7 @@
     "viewsWelcome": [
       {
         "view": "easy-c",
-        "contents": "[Run my program!](command:easy-c.compile-c)"
+        "contents": "[Run my program!](command:easy-c.compile-c)\n[Debug my program!](command:easy-c.debug-c)"
       }
     ]
   },
