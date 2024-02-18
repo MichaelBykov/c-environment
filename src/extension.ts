@@ -26,8 +26,15 @@ export function activate(context: vscode.ExtensionContext) {
       const outputFile = `${cwd}/a.out`
       
       await execAsync(`cc ${inputFiles} -o ${outputFile}`)
-      await execAsync(outputFile)
 
+      const task = new vscode.Task(
+        { type: 'shell' },
+        vscode.TaskScope.Workspace,
+        'Run C',
+        'Easy C',
+        new vscode.ShellExecution(outputFile)
+      );
+      vscode.tasks.executeTask(task);
 
     } catch (error: any) {
       // TODO: Parse c compile error messages
