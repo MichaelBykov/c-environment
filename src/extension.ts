@@ -1,7 +1,14 @@
 import * as vscode from 'vscode';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { glob } from 'glob';
 const execAsync = promisify(exec);
+
+// Recursively find all .c files in the workspace and compile them
+// Then run the compiled file
+// If there are any compile errors, show them in the problems tab
+// If there are any runtime errors, show them in the terminal
+
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -22,10 +29,17 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
   
-      const inputFiles = `${cwd}/**.c`
+      const inputFiles = `${cwd}/**/*.c`
       const outputFile = `${cwd}/a.out`
+
+      const files = await glob(inputFiles)
+      if (files.length === 0) {
+        vscode.window.showErrorMessage('No .c files found');
+        return;
+      }
+      const filePaths = files.join(' ')
       
-      await execAsync(`cc ${inputFiles} -o ${outputFile}`)
+      await execAsync(`cc ${filePaths} -o ${outputFile} -fno-diagnostics-fixit-info -fdiagnostics-print-source-range-info -fno-caret-diagnostics -fno-color-diagnostics`)
 
       const task = new vscode.Task(
         { type: 'shell' },
@@ -37,9 +51,31 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.tasks.executeTask(task);
 
     } catch (error: any) {
-      // TODO: Parse c compile error messages
-      vscode.window.showErrorMessage(error?.message || 'An error occurred');
-      console.error(error)
+      const errors = error.stderr.split('\n').filter((line: string) => line.includes('error:'));
+      const diagnostics = errors.map((error: string) => {
+        const [file, line, column, _, message] = error.split(':');
+        const range = new vscode.Range(
+          new vscode.Position(parseInt(line) - 1, parseInt(column) - 1),
+          new vscode.Position(parseInt(line) - 1, parseInt(column) - 1)
+        );
+        return { file, range, message, severity: vscode.DiagnosticSeverity.Error }
+      })
+
+      const fileDiagnostics: { [file: string]: any[] } = {}
+      for (const { file, range, message, severity } of diagnostics) {
+        const existing = (fileDiagnostics[file] ??= [], fileDiagnostics[file])
+        existing.push(new vscode.Diagnostic(range, message, severity))
+      }
+
+      const diagnosticsMap = vscode.languages.createDiagnosticCollection('Easy C')
+      for (const [file, diagnostic] of Object.entries(fileDiagnostics)) {
+        diagnosticsMap.set(vscode.Uri.file(file), diagnostic)
+      }
+      
+      if (diagnostics.length === 0) {
+        vscode.window.showErrorMessage(error?.message || 'An error occurred');
+        console.error(error)
+      }
     }
 	});
 
